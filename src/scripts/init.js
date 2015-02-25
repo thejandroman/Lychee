@@ -151,12 +151,12 @@ $(document).ready(function() {
 		.on('keyup', '#password', function() { if ($(this).val().length>0) $(this).removeClass('error') })
 
 		/* Navigation */
-		.on('click', '.album', function() { lychee.goto($(this).attr('data-id')) })
+		// .on('click', '.album', function() { lychee.goto($(this).attr('data-id')) })
 		.on('click', '.photo', function() { lychee.goto(album.getID() + '/' + $(this).attr('data-id')) })
 
 		/* Context Menu */
 		.on('contextmenu', '.photo', function(e) { contextMenu.photo(photo.getID(), e) })
-		.on('contextmenu', '.album', function(e) { contextMenu.album(album.getID(), e) })
+		// .on('contextmenu', '.album', function(e) { contextMenu.album(album.getID(), e) })
 
 		/* Infobox */
 		.on(eventName, '#infobox_overlay', view.infobox.hide)

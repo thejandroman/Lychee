@@ -286,8 +286,9 @@ album.setTitle = function(albumIDs) {
 		} else if (visible.albums()) {
 
 			albumIDs.forEach(function(id) {
-				albums.json.content[id].title = newTitle;
-				view.albums.content.title(id);
+				// albums.json.content[id].title = newTitle;
+				// view.albums.content.title(id);
+				test.setTitle(id, newTitle);
 			});
 
 		}

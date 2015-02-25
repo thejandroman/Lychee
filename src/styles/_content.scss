@@ -123,6 +123,7 @@
 	/* Badges ------------------------------------------------*/
 	.album .badge,
 	.photo .badge {
+		display: none;
 		position: absolute;
 		margin: -1px 0 0 12px;
 		padding: 12px 8px 6px;
@@ -135,7 +136,9 @@
 		text-shadow: 0 1px 0 black(.4);
 		opacity: .9;
 
-		&:nth-child(2n) { margin-left: 54px; }
+		&--show { display: block; }
+
+		// &--show:nth-child(2n) { margin-left: 54px; }
 
 		.iconic {
 			fill: #fff;

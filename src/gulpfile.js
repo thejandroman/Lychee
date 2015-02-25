@@ -15,6 +15,7 @@ var catchError = function(err) {
 
 paths.view = {
 	js: [
+		'node_modules/react/dist/react.min.js',
 		'../src/scripts/_gup.js',
 		'../src/scripts/build.js',
 		'../src/scripts/view/main.js'
@@ -55,9 +56,12 @@ gulp.task('view--scripts', ['view--js'], function() {
 
 paths.main = {
 	js: [
+		'../src/scripts/components/*.jsx',
 		'../src/scripts/*.js'
 	],
 	scripts: [
+		'node_modules/react/dist/react-with-addons.min.js',
+		'bower_components/moment/min/moment.min.js',
 		'bower_components/jQuery/dist/jquery.min.js',
 		'bower_components/js-md5/js/md5.min.js',
 		'bower_components/mousetrap/mousetrap.min.js',
@@ -94,8 +98,8 @@ gulp.task('main--scripts', ['main--js'], function() {
 	var stream =
 		gulp.src(paths.main.scripts)
 			.pipe(plugins.concat('main.js', {newLine: "\n"}))
-			.pipe(plugins.uglify())
-			.on('error', catchError)
+			// .pipe(plugins.uglify())
+			// .on('error', catchError)
 			.pipe(gulp.dest('../dist/'));
 
 	return stream;

@@ -11,6 +11,10 @@ albums = {
 
 albums.load = function() {
 
+	test = React.render(<AlbumsApp />, document.getElementById('content'))
+
+	return true
+
 	var startTime,
 		durationTime,
 		waitTime;
