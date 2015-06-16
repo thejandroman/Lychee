@@ -153,9 +153,17 @@ class Video extends Module {
 					}
 				}
 
+                                #Create thumb
+                                #if(!$this->createThumb($path, $info['type'], ´$info['width'], $info['height'])){
+                                # #Log something if this fails 
+                                #}
+
 			}
 
 			$info = array();
+                        #Read file info
+                        $info = $this->getInfo($path);
+
 			# Use title of file
 			$info['title'] = substr(basename($file['name'], $extension), 0, 30);
 			# Size
@@ -164,7 +172,7 @@ class Video extends Module {
 			else $info['size'] = round($size, 1) . ' KB';
 
 			# Save to DB
-			$values	= array(LYCHEE_TABLE_PHOTOS, $id, $info['title'], $video_name, $description, $tags, $mime_type, 0, 0, $info['size'], '', '', '', '', '', '', '', '', $albumID, $public, $star, $checksum, '', 'video');
+			$values	= array(LYCHEE_TABLE_PHOTOS, $id, $info['title'], $video_name, $description, $tags, $mime_type, $info['width'], $info['height'], $info['size'], '', '', '', '', '', '', '', '', $albumID, $public, $star, $checksum, '', 'video');
 			$query	= Database::prepare($this->database, "INSERT INTO ? (id, title, url, description, tags, type, width, height, size, iso, aperture, make, model, shutter, focal, takestamp, thumbUrl, album, public, star, checksum, medium, media_type) VALUES ('?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?')", $values);
 			$result = $this->database->query($query);
 
@@ -213,5 +221,38 @@ class Video extends Module {
 		return false;
 
 	}
+
+        private function createThumb($url, $filename, $type, $width, $height){
+        
+        }
+
+        private function getInfo($url){
+            # Function uses avconv to get resolution and possible other infos about a video file
+            # Expects the following:
+            # (string) $url = Path to video file
+            # Returns the following:
+            # (array) $return containing these keys:
+            # (int) width
+            # (int) height
+
+            # Check dependencies
+            self::dependencies(isset($this->database, $url));
+
+            # Call plugins
+            $this->plugins(__METHOD__, 0 , func_get_args());
+
+            $command = "avconv " . $url . " 2>%1 | grep Video | perl -wle 'while(<>){ $_ =~ /.*?(\d+x\d+).*/; print $1 }'";
+            $output = exec( $command );
+            $resolution = explode( 'x', $output);
+            $result = array();
+            $result['width'] = $resolution[0];
+            $result['height'] = $resoluiton[1];
+
+            # Call plugins
+            $this->plugins(__METHOD__, 1, func_get_args());
+
+            return $result;
+
+        }
 
 }
