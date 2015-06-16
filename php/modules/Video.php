@@ -152,17 +152,12 @@ class Video extends Module {
 						exit('Error: Could not move video to uploads!');
 					}
 				}
-
-                                #Create thumb
-                                #if(!$this->createThumb($path, $info['type'], ´$info['width'], $info['height'])){
-                                # #Log something if this fails 
-                                #}
-
 			}
 
 			$info = array();
                         #Read file info
                         $info = $this->getInfo($path);
+                        $info['type'] = $mime_type;
 
 			# Use title of file
 			$info['title'] = substr(basename($file['name'], $extension), 0, 30);
@@ -170,6 +165,11 @@ class Video extends Module {
 			$size = filesize($path)/1024;
 			if ($size>=1024) $info['size'] = round($size/1024, 1) . ' MB';
 			else $info['size'] = round($size, 1) . ' KB';
+
+                        #Create thumb
+                        if(!$this->createThumb($path,$video_name, $info['type'], $info['width'], $info['height'])){
+                          #Log something if this fails
+                        }
 
 			# Save to DB
 			$values	= array(LYCHEE_TABLE_PHOTOS, $id, $info['title'], $video_name, $description, $tags, $mime_type, $info['width'], $info['height'], $info['size'], '', '', '', '', '', '', '', '', $albumID, $public, $star, $checksum, '', 'video');
@@ -223,7 +223,29 @@ class Video extends Module {
 	}
 
         private function createThumb($url, $filename, $type, $width, $height){
-        
+            # Function that uses avconv to generate a thumbnail for a video file
+            # Expects the following:
+            # (string) $url : the path to the original video file
+            # (string) $filename : the filename without path
+            # (string) $type : dunno why this is needed right now, only mp4 is supported
+            # (int) $width
+            # (int) $height
+            # Returns the following:
+            # (bool) $return : true on success, false otherwise
+
+            # Check dependencies
+            self::dependencies(isset($this->database, $url, $filename, $this->settings, $type, $width, $height));
+
+            # Call Plugins
+            $this->plugins(__METHOD__, 0, func_get_args());
+
+            #First step is to take a frame from the video which will then be resized
+            $videoName = explode( '.', $filename);
+            $command = "avconv  -itsoffset -4  -i ".$url." -vcodec mjpeg -vframes 1 -an -f rawvideo -s ".$width."x".$height." ". LYCHEE_UPLOADS_THUMB . $videoName[0] ."@original.jpg";
+            Log::notice($this->database,__METHOD__,__LINE__, "Command: " . $command);
+            exec( $command );
+
+            return false;
         }
 
         private function getInfo($url){
@@ -241,9 +263,8 @@ class Video extends Module {
             # Call plugins
             $this->plugins(__METHOD__, 0 , func_get_args());
 
+            #Run a avconv (previously ffmpeg) command to get stats
             $command = "avconv -i " . $url . " -vstats 2>&1";
-
-            Log::notice($this->database, __METHOD__, __LINE__, "Command to get info: " . "$command");
             $output = shell_exec( $command );
 
             $regex_sizes = "/Video: ([^,]*), ([^,]*), ([0-9]{1,4})x([0-9]{1,4})/";
@@ -252,7 +273,7 @@ class Video extends Module {
                 $width = $regs [3] ? $regs [3] : null;
                 $height = $regs [4] ? $regs [4] : null;
             }
-            Log::notice($this->database, __METHOD__, __LINE__, "Parsed width:" . $width . " height:" . $height);
+            #Create the return stuff
             $result = array();
             $result['width'] = $width;
             $result['height'] = $height;
