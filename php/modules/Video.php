@@ -241,12 +241,21 @@ class Video extends Module {
             # Call plugins
             $this->plugins(__METHOD__, 0 , func_get_args());
 
-            $command = "avconv " . $url . " 2>%1 | grep Video | perl -wle 'while(<>){ $_ =~ /.*?(\d+x\d+).*/; print $1 }'";
-            $output = exec( $command );
-            $resolution = explode( 'x', $output);
+            $command = "avconv -i " . $url . " -vstats 2>&1";
+
+            Log::notice($this->database, __METHOD__, __LINE__, "Command to get info: " . "$command");
+            $output = shell_exec( $command );
+
+            $regex_sizes = "/Video: ([^,]*), ([^,]*), ([0-9]{1,4})x([0-9]{1,4})/";
+            if (preg_match($regex_sizes, $output, $regs)) {
+                $codec = $regs [1] ? $regs [1] : null;
+                $width = $regs [3] ? $regs [3] : null;
+                $height = $regs [4] ? $regs [4] : null;
+            }
+            Log::notice($this->database, __METHOD__, __LINE__, "Parsed width:" . $width . " height:" . $height);
             $result = array();
-            $result['width'] = $resolution[0];
-            $result['height'] = $resoluiton[1];
+            $result['width'] = $width;
+            $result['height'] = $height;
 
             # Call plugins
             $this->plugins(__METHOD__, 1, func_get_args());
