@@ -241,7 +241,7 @@ class Video extends Module {
 
             #First step is to take a frame from the video which will then be resized
             $videoName = explode( '.', $filename);
-            $thumbOriginal = $videoName[0].".jpg";
+            $thumbOriginal = $videoName[0]."@original.jpg";
 
             $command = "avconv  -itsoffset -4  -i ".$url." -vcodec mjpeg -vframes 1 -an -f rawvideo -s ".$width."x".$height." ". LYCHEE_UPLOADS_THUMB . $thumbOriginal;
             Log::notice($this->database,__METHOD__,__LINE__, "Command: " . $command);
@@ -261,7 +261,7 @@ class Video extends Module {
 
                     # Read image
                     $thumb = new Imagick();
-                    $thumb->readImage($thumbOriginal);
+                    $thumb->readImage(LYCHEE_UPLOADS_THUMB . $thumbOriginal);
                     $thumb->setImageCompressionQuality($this->settings['thumbQuality']);
                     $thumb->setImageFormat('jpeg');
 
@@ -282,6 +282,8 @@ class Video extends Module {
              }
 
 
+            # Finally delete the original thumbnail frame
+            unlink( LYCHEE_UPLOADS_THUMB . $thumbOriginal);
 
             return false;
         }
