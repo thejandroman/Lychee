@@ -263,30 +263,37 @@ class Video extends Module {
             $newUrl2x       = LYCHEE_UPLOADS_THUMB . $videoName[0] . '@2x.jpeg'; 
 
             # Create thumbnails with Imagick
-            if(extension_loaded('imagick')&&$this->settings['imagick']==='1'&&false) {
+            if(extension_loaded('imagick')&&$this->settings['imagick']==='1') {
 
-                    # Read image
-                    $thumb = new Imagick();
-                    $thumb->readImage($thumbOriginalPath);
-                    $thumb->setImageCompressionQuality($this->settings['thumbQuality']);
-                    $thumb->setImageFormat('jpeg');
+                # Read icon image first
+                $icon = new Imagick( LYCHEE . "/src/images/icon_play_overlay.png);
+                
+                # Read image
+                $thumb = new Imagick();
+                $thumb->readImage($thumbOriginalPath);
+                $thumb->setImageCompressionQuality($this->settings['thumbQuality']);
+                $thumb->setImageFormat('jpeg');
 
-                    # Copy image for 2nd thumb version
-                    $thumb2x = clone $thumb;
+                # Copy image for 2nd thumb version
+                $thumb2x = clone $thumb;
 
-                    # Create 1st version
-                    $thumb->cropThumbnailImage($newWidth, $newHeight);
-                    $thumb->writeImage($newUrl);
-                    $thumb->clear();
-                    $thumb->destroy();
+                # Create 1st version
+                $thumb->cropThumbnailImage($newWidth, $newHeight);
+                #Composite the icon
+                $icon->setImageColospace( $thumb->getImageColorspace() );
+                $thumb->compositeImage($icon, imagick::COMPOSITE_DEFAULT, 0, 0 );
 
-                    # Create 2nd version
-                    $thumb2x->cropThumbnailImage($newWidth*2, $newHeight*2);
-                    $thumb2x->writeImage($newUrl2x);
-                    $thumb2x->clear();
-                    $thumb2x->destroy();
+                $thumb->writeImage($newUrl);
+                $thumb->clear();
+                $thumb->destroy();
+
+                # Create 2nd version
+                $thumb2x->cropThumbnailImage($newWidth*2, $newHeight*2);
+                $thumb2x->writeImage($newUrl2x);
+                $thumb2x->clear();
+                $thumb2x->destroy();
             }
-            else{
+            else if(false){
                 # Create image
                 $thumb          = imagecreatetruecolor($newWidth, $newHeight);
                 $thumb2x        = imagecreatetruecolor($newWidth*2, $newHeight*2);
