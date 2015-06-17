@@ -290,23 +290,20 @@ class Video extends Module {
                 # Create image
                 $thumb          = imagecreatetruecolor($newWidth, $newHeight);
                 $thumb2x        = imagecreatetruecolor($newWidth*2, $newHeight*2);
+
                 # Set position
                 if ($width<$height) {
                         $newSize                = $width;
                         $startWidth             = 0;
-                        $startHeight    = $height/2 - $width/2;
+                        $startHeight            = $height/2 - $width/2;
                 } else {
                         $newSize                = $height;
                         $startWidth             = $width/2 - $height/2;
-                        $startHeight    = 0;
+                        $startHeight            = 0;
                 }
+
                 # Create new image
-                switch($type) {
-                       case 'image/jpeg':      $sourceImg = imagecreatefromjpeg($thumbOriginalPath); break;
-                       default:                        Log::error($this->database, __METHOD__, __LINE__, 'Type of photo is not supported');
-                                                        return false;
-                                                        break;
-                }
+               $sourceImg = imagecreatefromjpeg($thumbOriginalPath); 
          
                 # Create thumb
                 fastimagecopyresampled($thumb, $sourceImg, 0, 0, $startWidth, $startHeight, $newWidth, $newHeight, $newSize, $newSize);
