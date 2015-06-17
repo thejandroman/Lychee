@@ -1121,7 +1121,7 @@ class Photo extends Module {
 
 			# Duplicate entry
 			$values		= array(LYCHEE_TABLE_PHOTOS, $id, LYCHEE_TABLE_PHOTOS, $photo->id);
-			$query		= Database::prepare($this->database, "INSERT INTO ? (id, title, url, description, tags, type, width, height, size, iso, aperture, make, model, shutter, focal, takestamp, thumbUrl, album, public, star, checksum) SELECT '?' AS id, title, url, description, tags, type, width, height, size, iso, aperture, make, model, shutter, focal, takestamp, thumbUrl, album, public, star, checksum FROM ? WHERE id = '?'", $values);
+			$query		= Database::prepare($this->database, "INSERT INTO ? (id, title, url, description, tags, type, width, height, size, iso, aperture, make, model, shutter, focal, takestamp, thumbUrl, album, public, star, checksum, media_type) SELECT '?' AS id, title, url, description, tags, type, width, height, size, iso, aperture, make, model, shutter, focal, takestamp, thumbUrl, album, public, star, checksum, media_type FROM ? WHERE id = '?'", $values);
 			$duplicate	= $this->database->query($query);
 			if (!$duplicate) {
 				Log::error($this->database, __METHOD__, __LINE__, $this->database->error);
@@ -1189,6 +1189,14 @@ class Photo extends Module {
 					Log::error($this->database, __METHOD__, __LINE__, 'Could not delete high-res photo in uploads/thumb/');
 					return false;
 				}
+
+                                #Delete video
+                                if (file_exists(LYCHEE_URL_UPLOADS_VIDEO . $photo->url)&&!unlink(LYCHEE_URL_UPLOADS_VIDEO . $photo->url))	 {
+					Log::error($this->database, __METHOD__, __LINE__, 'Could not delete video in uploads/video/');
+					return false;
+				}
+
+
 
 			}
 
