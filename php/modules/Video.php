@@ -241,9 +241,47 @@ class Video extends Module {
 
             #First step is to take a frame from the video which will then be resized
             $videoName = explode( '.', $filename);
-            $command = "avconv  -itsoffset -4  -i ".$url." -vcodec mjpeg -vframes 1 -an -f rawvideo -s ".$width."x".$height." ". LYCHEE_UPLOADS_THUMB . $videoName[0] ."@original.jpg";
+            $thumbOriginal = $videoName[0].".jpg";
+
+            $command = "avconv  -itsoffset -4  -i ".$url." -vcodec mjpeg -vframes 1 -an -f rawvideo -s ".$width."x".$height." ". LYCHEE_UPLOADS_THUMB . $thumbOriginal;
             Log::notice($this->database,__METHOD__,__LINE__, "Command: " . $command);
             exec( $command );
+
+            # Next create the actual thumbnails using the same code as used for photos
+            # Size of the thumbnail
+            $newWidth       = 200;
+            $newHeight      = 200;
+
+            $videoName      = explode('.', $filename);
+            $newUrl         = LYCHEE_UPLOADS_THUMB . $videoName[0] . '.jpeg';
+            $newUrl2x       = LYCHEE_UPLOADS_THUMB . $videoName[0] . '@2x.jpeg'; 
+
+            # Create thumbnails with Imagick
+            if(extension_loaded('imagick')&&$this->settings['imagick']==='1') {
+
+                    # Read image
+                    $thumb = new Imagick();
+                    $thumb->readImage($thumbOriginal);
+                    $thumb->setImageCompressionQuality($this->settings['thumbQuality']);
+                    $thumb->setImageFormat('jpeg');
+
+                    # Copy image for 2nd thumb version
+                    $thumb2x = clone $thumb;
+
+                    # Create 1st version
+                    $thumb->cropThumbnailImage($newWidth, $newHeight);
+                    $thumb->writeImage($newUrl);
+                    $thumb->clear();
+                    $thumb->destroy();
+
+                    # Create 2nd version
+                    $thumb2x->cropThumbnailImage($newWidth*2, $newHeight*2);
+                    $thumb2x->writeImage($newUrl2x);
+                    $thumb2x->clear();
+                    $thumb2x->destroy();
+             }
+
+
 
             return false;
         }
