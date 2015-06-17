@@ -168,11 +168,15 @@ class Video extends Module {
 
                         #Create thumb
                         if(!$this->createThumb($path,$video_name, $info['type'], $info['width'], $info['height'])){
-                          #Log something if this fails
+                            Log::error($this->database, __METHOD__,__LINE__, "Could not create thumbnail for video");
+                            exit("Error:Could not create thumbnail for video");
                         }
 
+                        #Set the thumbnail url
+                        $path_thumb = md5($id) . ".jpeg";
+
 			# Save to DB
-			$values	= array(LYCHEE_TABLE_PHOTOS, $id, $info['title'], $video_name, $description, $tags, $mime_type, $info['width'], $info['height'], $info['size'], '', '', '', '', '', '', '', '', $albumID, $public, $star, $checksum, '', 'video');
+			$values	= array(LYCHEE_TABLE_PHOTOS, $id, $info['title'], $video_name, $description, $tags, $mime_type, $info['width'], $info['height'], $info['size'], '', '', '', '', '', '', '', $path_thumb, $albumID, $public, $star, $checksum, '', 'video');
 			$query	= Database::prepare($this->database, "INSERT INTO ? (id, title, url, description, tags, type, width, height, size, iso, aperture, make, model, shutter, focal, takestamp, thumbUrl, album, public, star, checksum, medium, media_type) VALUES ('?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?')", $values);
 			$result = $this->database->query($query);
 
@@ -285,7 +289,7 @@ class Video extends Module {
             # Finally delete the original thumbnail frame
             unlink( LYCHEE_UPLOADS_THUMB . $thumbOriginal);
 
-            return false;
+            return true;
         }
 
         private function getInfo($url){
