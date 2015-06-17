@@ -321,7 +321,7 @@ class Video extends Module {
 
 
             # Finally delete the original thumbnail frame
-            unlink( LYCHEE_UPLOADS_THUMB . $thumbOriginal);
+            unlink( $thumbOriginalPath );
 
             return true;
         }
