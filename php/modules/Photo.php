@@ -1191,7 +1191,7 @@ class Photo extends Module {
 				}
 
                                 #Delete video
-                                if (file_exists(LYCHEE_URL_UPLOADS_VIDEO . $photo->url)&&!unlink(LYCHEE_URL_UPLOADS_VIDEO . $photo->url))	 {
+                                if (file_exists(LYCHEE_UPLOADS_VIDEO . $photo->url)&&!unlink(LYCHEE_UPLOADS_VIDEO . $photo->url))	 {
 					Log::error($this->database, __METHOD__, __LINE__, 'Could not delete video in uploads/video/');
 					return false;
 				}
