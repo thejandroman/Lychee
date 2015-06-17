@@ -288,7 +288,7 @@ class Video extends Module {
                 $thumb->cropThumbnailImage($newWidth, $newHeight);
 
                 #Composite the icon
-                $thumb->cropThumbnailImage($iconWidth, $iconHeight);
+                $icon->cropThumbnailImage($iconWidth, $iconHeight);
                 $thumb->compositeImage($icon, imagick::COMPOSITE_DEFAULT, $newWidth / 2, $newHeight / 2 );
 
                 #Save the small thumbnail
