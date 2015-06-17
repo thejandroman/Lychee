@@ -258,6 +258,9 @@ class Video extends Module {
             $newWidth       = 200;
             $newHeight      = 200;
 
+            $iconWidth      = 50;
+            $iconHeight     = 50;
+
             $videoName      = explode('.', $filename);
             $newUrl         = LYCHEE_UPLOADS_THUMB . $videoName[0] . '.jpeg';
             $newUrl2x       = LYCHEE_UPLOADS_THUMB . $videoName[0] . '@2x.jpeg'; 
@@ -266,7 +269,7 @@ class Video extends Module {
             if(extension_loaded('imagick')&&$this->settings['imagick']==='1') {
 
                 # Read icon image first
-                $icon = new Imagick( LYCHEE . "/src/images/icon_play_overlay.png);
+                $icon = new Imagick( LYCHEE . "/src/images/icon_play_overlay.png");
                 
                 # Read image
                 $thumb = new Imagick();
@@ -274,15 +277,21 @@ class Video extends Module {
                 $thumb->setImageCompressionQuality($this->settings['thumbQuality']);
                 $thumb->setImageFormat('jpeg');
 
+                #Set the colorspace of the icon to the same as the image
+                $icon->setImageColorspace( $thumb->getImageColorspace() );
+
                 # Copy image for 2nd thumb version
                 $thumb2x = clone $thumb;
+                $icon2x = clone $icon;
 
                 # Create 1st version
                 $thumb->cropThumbnailImage($newWidth, $newHeight);
-                #Composite the icon
-                $icon->setImageColospace( $thumb->getImageColorspace() );
-                $thumb->compositeImage($icon, imagick::COMPOSITE_DEFAULT, 0, 0 );
 
+                #Composite the icon
+                $thumb->cropThumbnailImage($iconWidth, $iconHeight);
+                $thumb->compositeImage($icon, imagick::COMPOSITE_DEFAULT, $newWidth / 2, $newHeight / 2 );
+
+                #Save the small thumbnail
                 $thumb->writeImage($newUrl);
                 $thumb->clear();
                 $thumb->destroy();
