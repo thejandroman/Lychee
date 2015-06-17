@@ -308,6 +308,9 @@ class Video extends Module {
                 $thumb2x->destroy();
             }
             else if(false){
+                # Read icon image first
+                $icon           = imagecreatetruecolor($iconWidth, $iconHeight);
+
                 # Create image
                 $thumb          = imagecreatetruecolor($newWidth, $newHeight);
                 $thumb2x        = imagecreatetruecolor($newWidth*2, $newHeight*2);
@@ -324,10 +327,13 @@ class Video extends Module {
                 }
 
                 # Create new image
-               $sourceImg = imagecreatefromjpeg($thumbOriginalPath); 
+                $sourceImg = imagecreatefromjpeg($thumbOriginalPath); 
+                $sourceIcon = imagecreatefrompng( LYCHEE . "/src/images/icon_play_overlay.png");
          
                 # Create thumb
                 fastimagecopyresampled($thumb, $sourceImg, 0, 0, $startWidth, $startHeight, $newWidth, $newHeight, $newSize, $newSize);
+                #Overlay icon
+                fastimagecopyresampled( $thumb, $sourceIcon, ($newWidth / 2) - ( $iconWidth /2 ), ( $newHeight / 2) - ( $iconHeight / 2), 0, 0, $iconWidth, $iconHeight, $iconWidth, $iconHeight );
                 imagejpeg($thumb, $newUrl, $this->settings['thumbQuality']);
                 imagedestroy($thumb);
              
