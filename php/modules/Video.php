@@ -289,7 +289,7 @@ class Video extends Module {
 
                 #Composite the icon
                 $icon->cropThumbnailImage($iconWidth, $iconHeight);
-                $thumb->compositeImage($icon, imagick::COMPOSITE_DEFAULT, $newWidth / 2, $newHeight / 2 );
+                $thumb->compositeImage($icon, imagick::COMPOSITE_DEFAULT, ($newWidth / 2) - ($iconWidth / 2 ), ($newHeight / 2) - ( $iconHeight / 2) );
 
                 #Save the small thumbnail
                 $thumb->writeImage($newUrl);
@@ -298,6 +298,11 @@ class Video extends Module {
 
                 # Create 2nd version
                 $thumb2x->cropThumbnailImage($newWidth*2, $newHeight*2);
+
+                # Composite the icon
+                $icon2x->cropThumbnailImage( $iconWidth * 2, $iconHeight * 2);
+                $thumb2x->compositeImage($icon2x, imagick::COMPOSITE_DEFAULT, $newWidth - $iconWidth, $newHeight - $iconHeight );
+
                 $thumb2x->writeImage($newUrl2x);
                 $thumb2x->clear();
                 $thumb2x->destroy();
