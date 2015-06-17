@@ -161,6 +161,7 @@ class Video extends Module {
 
 			# Use title of file
 			$info['title'] = substr(basename($file['name'], $extension), 0, 30);
+
 			# Size
 			$size = filesize($path)/1024;
 			if ($size>=1024) $info['size'] = round($size/1024, 1) . ' MB';
@@ -245,9 +246,10 @@ class Video extends Module {
 
             #First step is to take a frame from the video which will then be resized
             $videoName = explode( '.', $filename);
-            $thumbOriginal = $videoName[0]."@original.jpg";
+            $thumbOriginalName = $videoName[0]."@original.jpg";
+            $thumbOriginalPath = LYCHEE_UPLOADS_THUMB . $thumbOriginalName;
 
-            $command = "avconv  -itsoffset -4  -i ".$url." -vcodec mjpeg -vframes 1 -an -f rawvideo -s ".$width."x".$height." ". LYCHEE_UPLOADS_THUMB . $thumbOriginal;
+            $command = "avconv  -itsoffset -4  -i ".$url." -vcodec mjpeg -vframes 1 -an -f rawvideo -s ".$width."x".$height." ". $thumbOriginalPath;
             Log::notice($this->database,__METHOD__,__LINE__, "Command: " . $command);
             exec( $command );
 
@@ -261,11 +263,11 @@ class Video extends Module {
             $newUrl2x       = LYCHEE_UPLOADS_THUMB . $videoName[0] . '@2x.jpeg'; 
 
             # Create thumbnails with Imagick
-            if(extension_loaded('imagick')&&$this->settings['imagick']==='1') {
+            if(extension_loaded('imagick')&&$this->settings['imagick']==='1'&&false) {
 
                     # Read image
                     $thumb = new Imagick();
-                    $thumb->readImage(LYCHEE_UPLOADS_THUMB . $thumbOriginal);
+                    $thumb->readImage($thumbOriginalPath);
                     $thumb->setImageCompressionQuality($this->settings['thumbQuality']);
                     $thumb->setImageFormat('jpeg');
 
@@ -283,7 +285,42 @@ class Video extends Module {
                     $thumb2x->writeImage($newUrl2x);
                     $thumb2x->clear();
                     $thumb2x->destroy();
-             }
+            }
+            else{
+                # Create image
+                $thumb          = imagecreatetruecolor($newWidth, $newHeight);
+                $thumb2x        = imagecreatetruecolor($newWidth*2, $newHeight*2);
+                # Set position
+                if ($width<$height) {
+                        $newSize                = $width;
+                        $startWidth             = 0;
+                        $startHeight    = $height/2 - $width/2;
+                } else {
+                        $newSize                = $height;
+                        $startWidth             = $width/2 - $height/2;
+                        $startHeight    = 0;
+                }
+                # Create new image
+                switch($type) {
+                       case 'image/jpeg':      $sourceImg = imagecreatefromjpeg($thumbOriginalPath); break;
+                       default:                        Log::error($this->database, __METHOD__, __LINE__, 'Type of photo is not supported');
+                                                        return false;
+                                                        break;
+                }
+         
+                # Create thumb
+                fastimagecopyresampled($thumb, $sourceImg, 0, 0, $startWidth, $startHeight, $newWidth, $newHeight, $newSize, $newSize);
+                imagejpeg($thumb, $newUrl, $this->settings['thumbQuality']);
+                imagedestroy($thumb);
+             
+                # Create retina thumb
+                fastimagecopyresampled($thumb2x, $sourceImg, 0, 0, $startWidth, $startHeight, $newWidth*2, $newHeight*2, $newSize, $newSize);
+                imagejpeg($thumb2x, $newUrl2x, $this->settings['thumbQuality']);
+                imagedestroy($thumb2x);
+                
+                # Free memory
+                imagedestroy($sourceImg);  
+            }
 
 
             # Finally delete the original thumbnail frame
