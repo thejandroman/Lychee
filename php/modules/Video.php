@@ -266,7 +266,7 @@ class Video extends Module {
             $newUrl2x       = LYCHEE_UPLOADS_THUMB . $videoName[0] . '@2x.jpeg'; 
 
             # Create thumbnails with Imagick
-            if(extension_loaded('imagick')&&$this->settings['imagick']==='1') {
+            if(extension_loaded('imagick')&&$this->settings['imagick']==='1'&&false) {
 
                 # Read icon image first
                 $icon = new Imagick( LYCHEE . "/src/images/icon_play_overlay.png");
@@ -307,10 +307,10 @@ class Video extends Module {
                 $thumb2x->clear();
                 $thumb2x->destroy();
             }
-            else if(false){
+            else if(true){
                 # Read icon image first
                 $iconPath       = LYCHEE . "/src/images/icon_play_overlay.png";
-                $iconSize       getimagesize($iconPath);
+                $iconSize       = getimagesize($iconPath);
                 $icon           = imagecreatetruecolor($iconSize[0], $iconSize[1]);
 
                 # Create image
@@ -334,13 +334,13 @@ class Video extends Module {
          
                 # Create thumb
                 fastimagecopyresampled($thumb, $sourceImg, 0, 0, $startWidth, $startHeight, $newWidth, $newHeight, $newSize, $newSize);
-                #Overlay icon
                 fastimagecopyresampled( $thumb, $sourceIcon, ($newWidth / 2) - ( $iconWidth /2 ), ( $newHeight / 2) - ( $iconHeight / 2), 0, 0, $iconWidth, $iconHeight, $iconSize[0], $iconSize[1]);
                 imagejpeg($thumb, $newUrl, $this->settings['thumbQuality']);
                 imagedestroy($thumb);
              
                 # Create retina thumb
                 fastimagecopyresampled($thumb2x, $sourceImg, 0, 0, $startWidth, $startHeight, $newWidth*2, $newHeight*2, $newSize, $newSize);
+                fastimagecopyresampled( $thumb2x, $sourceIcon, $newWidth - $iconWidth, $newHeight - $iconHeight, 0, 0, $iconWidth * 2, $iconHeight * 2, $iconSize[0], $iconSize[1]);
                 imagejpeg($thumb2x, $newUrl2x, $this->settings['thumbQuality']);
                 imagedestroy($thumb2x);
                 
