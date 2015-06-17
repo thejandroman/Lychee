@@ -266,7 +266,7 @@ class Video extends Module {
             $newUrl2x       = LYCHEE_UPLOADS_THUMB . $videoName[0] . '@2x.jpeg'; 
 
             # Create thumbnails with Imagick
-            if(extension_loaded('imagick')&&$this->settings['imagick']==='1'&&false) {
+            if(extension_loaded('imagick')&&$this->settings['imagick']==='1') {
 
                 # Read icon image first
                 $icon = new Imagick( LYCHEE . "/src/images/icon_play_overlay.png");
@@ -307,7 +307,7 @@ class Video extends Module {
                 $thumb2x->clear();
                 $thumb2x->destroy();
             }
-            else if(true){
+            else{
                 # Read icon image first
                 $iconPath       = LYCHEE . "/src/images/icon_play_overlay.png";
                 $iconSize       = getimagesize($iconPath);
@@ -346,6 +346,7 @@ class Video extends Module {
                 
                 # Free memory
                 imagedestroy($sourceImg);  
+                imagedestroy($sourceIcon);
             }
 
 
@@ -390,6 +391,11 @@ class Video extends Module {
 
             return $result;
 
+        }
+
+        public function delete(){
+        
+            Log::notice($this->database, __METHOD__, __LINE__, "delete video");
         }
 
 }
