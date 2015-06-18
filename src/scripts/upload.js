@@ -224,14 +224,14 @@ upload.start = {
 			else					files[i].next = null;
 
 			// Check if file is supported
-			if (supportedImageFileTypes.index( files[i].type ) > -1 ) {
+			if (supportedImageFileTypes.indexOf( files[i].type ) > -1 ) {
 
 				files[i].ready		= false;
 				files[i].supported	= true;
                                 files[i].type           = "image";
 
 			}
-                        else if (supportedVideoFileTypes.index( files[i].type ) == -1 ) {
+                        else if (supportedVideoFileTypes.indexOf( files[i].type ) > -1 ) {
 
                                 files[i].ready          = false;
                                 files[i].supported      = true;
