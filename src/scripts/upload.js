@@ -106,7 +106,14 @@ upload.start = {
 
 				}
 
-				formData.append('function', 'Photo::add');
+                                if( file.type === "image"){
+                                  formData.append( 'function', 'Photo::add');
+                                }
+                                else if (file.type === "video")
+                                {
+                                  formData.append( 'function', 'Video::add');
+                                }
+
 				formData.append('albumID', albumID);
 				formData.append('tags', '');
 				formData.append(0, file);
@@ -204,22 +211,32 @@ upload.start = {
 		if (files.length<=0) return false;
 		if (albumID===false||visible.albums()===true) albumID = 0;
 
+                var supportedImageFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                var supportedVideoFileTypes = ['video/mp4', 'video/ogg', 'video/webm', 'video/flv'];
+
 		for (var i = 0; i < files.length; i++) {
 
 			files[i].num		= i;
-			files[i].ready		= false;
-			files[i].supported	= true;
+			files[i].ready		= true;
+			files[i].supported	= false;
 
 			if (i < files.length-1)	files[i].next = files[i+1];
 			else					files[i].next = null;
 
 			// Check if file is supported
-			if (files[i].type!=='image/jpeg'&&files[i].type!=='image/jpg'&&files[i].type!=='image/png'&&files[i].type!=='image/gif') {
+			if (supportedImageFileTypes.index( files[i].type ) > -1 ) {
 
-				files[i].ready		= true;
-				files[i].supported	= false;
+				files[i].ready		= false;
+				files[i].supported	= true;
+                                files[i].type           = "image";
 
 			}
+                        else if (supportedVideoFileTypes.index( files[i].type ) == -1 ) {
+
+                                files[i].ready          = false;
+                                files[i].supported      = true;
+                                files[i].type           = "video";
+                        }
 
 		}
 
