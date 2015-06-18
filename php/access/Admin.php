@@ -36,7 +36,8 @@ class Admin extends Access {
 			case 'Photo::delete':			$this->deletePhoto(); break;
 
 			# Add functions
-			case 'Photo::add':				$this->upload(); break;
+			case 'Photo::add':				$this->uploadImage(); break;
+			case 'Video::add':				$this->uploadVideo(); break;
 			case 'Import::url':				$this->importUrl(); break;
 			case 'Import::server':			$this->importServer(); break;
 
@@ -208,11 +209,19 @@ class Admin extends Access {
 
 	# Add functions
 
-	private function upload() {
+	private function uploadImage() {
 
 		Module::dependencies(isset($_FILES, $_POST['albumID'], $_POST['tags']));
 		$photo = new Photo($this->database, $this->plugins, $this->settings, null);
 		echo $photo->add($_FILES, $_POST['albumID'], '', $_POST['tags']);
+
+	}
+
+	private function uploadVideo() {
+
+		Module::dependencies(isset($_FILES, $_POST['albumID'], $_POST['tags']));
+		$video = new Video($this->database, $this->plugins, $this->settings, null);
+		echo $video->add($_FILES, $_POST['albumID'], '', $_POST['tags']);
 
 	}
 

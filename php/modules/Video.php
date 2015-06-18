@@ -107,10 +107,10 @@ class Video extends Module {
 		foreach ( $files as $file ) {
 
 			# Verify file and set extension
-			$mime_type = Video::getMimeType($file);
+			$mime_type = Video::getMimeType($file['tmp_name']);
 			if ( $mime_type === false ) {
 				Log::error($this->database, __METHOD__, __LINE__, 'Video format not supported');
-				exit('Error: Video format not supported!');
+				exit('Error: Video format  not supported!');
 			}
 			$extension = self::$allowedMimeTypes[$mime_type];
 

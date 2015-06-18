@@ -105,11 +105,12 @@ upload.start = {
 					return false;
 
 				}
+                                console.log("file in upload: " + file.media_type);
 
-                                if( file.type === "image"){
+                                if( file.media_type === "image"){
                                   formData.append( 'function', 'Photo::add');
                                 }
-                                else if (file.type === "video")
+                                else if (file.media_type === "video")
                                 {
                                   formData.append( 'function', 'Video::add');
                                 }
@@ -228,15 +229,17 @@ upload.start = {
 
 				files[i].ready		= false;
 				files[i].supported	= true;
-                                files[i].type           = "image";
+                                files[i].media_type           = "image";
 
 			}
                         else if (supportedVideoFileTypes.indexOf( files[i].type ) > -1 ) {
 
                                 files[i].ready          = false;
                                 files[i].supported      = true;
-                                files[i].type           = "video";
+                                files[i].media_type           = "video";
                         }
+
+                        console.log("filetype: " + files[i].media_type);
 
 		}
 
