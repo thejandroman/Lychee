@@ -15,6 +15,7 @@ class Video extends Module {
 	public static $allowedMimeTypes = array(
 		'video/mp4' => '.mp4',
 		'video/ogg' => '.ogv',
+		'application/ogg' => '.ogv',
 		'video/webm' => '.webm',
 		'video/x-flv' => '.flv',
 	);
@@ -122,6 +123,7 @@ class Video extends Module {
 			$tmp_name	= $file['tmp_name'];
 			$video_name	= md5($id) . $extension;
 			$path		= LYCHEE_UPLOADS_VIDEO . $video_name;
+                        $path_thumb     = "";
 
 			# Create checksum based on $mime_type and $tmp_name
 			$checksum = sha1_file($tmp_name);
@@ -135,6 +137,7 @@ class Video extends Module {
 			if ($exists!==false) {
 				$video_name	= $exists['video_name'];
 				$path		= $exists['path'];
+                                $path_thumb     = $exists['path_thumb'];
 				$exists		= true;
 			}
 
@@ -167,14 +170,18 @@ class Video extends Module {
 			if ($size>=1024) $info['size'] = round($size/1024, 1) . ' MB';
 			else $info['size'] = round($size, 1) . ' KB';
 
-                        #Create thumb
-                        if(!$this->createThumb($path,$video_name, $info['type'], $info['width'], $info['height'])){
-                            Log::error($this->database, __METHOD__,__LINE__, "Could not create thumbnail for video");
-                            exit("Error:Could not create thumbnail for video");
-                        }
+                        if($exists===false){
+        
+                           #Create thumb
+                           if(!$this->createThumb($path,$video_name, $info['type'], $info['width'], $info['height'])){
+                              Log::error($this->database, __METHOD__,__LINE__, "Could not create thumbnail for video");
+                              exit("Error:Could not create thumbnail for video");
+                          }
 
-                        #Set the thumbnail url
-                        $path_thumb = md5($id) . ".jpeg";
+                          #Set the thumbnail url
+                          $path_thumb = md5($id) . ".jpeg";
+
+                        }
 
 			# Save to DB
 			$values	= array(LYCHEE_TABLE_PHOTOS, $id, $info['title'], $video_name, $description, $tags, $mime_type, $info['width'], $info['height'], $info['size'], '', '', '', '', '', '', '', $path_thumb, $albumID, $public, $star, $checksum, '', 'video');
@@ -200,8 +207,8 @@ class Video extends Module {
 		self::dependencies(isset($this->database, $checksum));
 
 		# Exclude $videoID from select when $videoID is set
-		if (!is_null($videoID)) $query = Database::prepare($this->database, "SELECT id, url FROM ? WHERE checksum = '?' AND id <> '?' LIMIT 1", array(LYCHEE_TABLE_PHOTOS, $checksum, $videoID));
-		else $query = Database::prepare($this->database, "SELECT id, url FROM ? WHERE checksum = '?' LIMIT 1", array(LYCHEE_TABLE_PHOTOS, $checksum));
+		if (!is_null($videoID)) $query = Database::prepare($this->database, "SELECT id, url, thumbUrl FROM ? WHERE checksum = '?' AND id <> '?' LIMIT 1", array(LYCHEE_TABLE_PHOTOS, $checksum, $videoID));
+		else $query = Database::prepare($this->database, "SELECT id, url, thumbUrl FROM ? WHERE checksum = '?' LIMIT 1", array(LYCHEE_TABLE_PHOTOS, $checksum));
 
 		$result	= $this->database->query($query);
 
@@ -216,7 +223,8 @@ class Video extends Module {
 
 			$return = array(
 				'video_name'	=> $result->url,
-				'path'			=> LYCHEE_UPLOADS_VIDEO . $result->url,
+                                'path_thumb'    => $result->thumbUrl,
+				'path'	        => LYCHEE_UPLOADS_VIDEO . $result->url,
 			);
 
 			return $return;

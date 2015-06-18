@@ -105,7 +105,6 @@ upload.start = {
 					return false;
 
 				}
-                                console.log("file in upload: " + file.media_type);
 
                                 if( file.media_type === "image"){
                                   formData.append( 'function', 'Photo::add');
@@ -212,10 +211,12 @@ upload.start = {
 		if (files.length<=0) return false;
 		if (albumID===false||visible.albums()===true) albumID = 0;
 
-                var supportedImageFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-                var supportedVideoFileTypes = ['video/mp4', 'video/ogg', 'video/webm', 'video/flv'];
+                var supportedImageFileTypes = ['image/jpeg', '.jpeg', 'image/jpg', 'jpg', 'image/png', 'png', 'image/gif', 'gif'];
+                var supportedVideoFileTypes = ['video/mp4', 'mp4', 'video/ogg', 'ogv', 'video/ogv', 'video/webm', 'webm', 'video/x-flv', 'flv'];
 
 		for (var i = 0; i < files.length; i++) {
+
+                      console.log(files[i]);
 
 			files[i].num		= i;
 			files[i].ready		= true;
@@ -224,22 +225,23 @@ upload.start = {
 			if (i < files.length-1)	files[i].next = files[i+1];
 			else					files[i].next = null;
 
+                        var extension = files[i].name.split('.').pop();
+
 			// Check if file is supported
-			if (supportedImageFileTypes.indexOf( files[i].type ) > -1 ) {
+			if (supportedImageFileTypes.indexOf( files[i].type ) > -1  || supportedImageFileTypes.indexOf(extension) > -1) {
 
 				files[i].ready		= false;
 				files[i].supported	= true;
                                 files[i].media_type           = "image";
 
 			}
-                        else if (supportedVideoFileTypes.indexOf( files[i].type ) > -1 ) {
+                        else if (supportedVideoFileTypes.indexOf( files[i].type ) > -1 || supportedVideoFileTypes.indexOf(extension) > -1) {
 
                                 files[i].ready          = false;
                                 files[i].supported      = true;
                                 files[i].media_type           = "video";
                         }
 
-                        console.log("filetype: " + files[i].media_type);
 
 		}
 
