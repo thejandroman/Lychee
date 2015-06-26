@@ -18,3 +18,5 @@ plugins/*
 
 !plugins/check/
 !plugins/displaylog/
+
+*.swp
