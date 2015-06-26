@@ -15,5 +15,5 @@ VALUES
   ('imagick','1'),
   ('dropboxKey',''),
   ('identifier',''),
-  ('plugins','');
-  ('sessionLength','1440');
+  ('plugins',''),
+  ('sessionLength',1440);
