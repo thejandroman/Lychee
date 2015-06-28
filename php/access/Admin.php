@@ -59,6 +59,7 @@ class Admin extends Access {
 			case 'Photo::getArchive':		$this->getPhotoArchive(); break;
 
       # User functions
+      case 'Users::get':           $this->getUsers(); break;
       case 'Users::addUser':       $this->addUser(); break;
       case 'Users::deleteUser':    $this->deleteUser(); break;
       case 'Users::changePassword':$this->changePassword(); break;
@@ -289,14 +290,8 @@ class Admin extends Access {
 	private function setLogin() {
 
 		Module::dependencies(isset($_POST['username'], $_POST['password']));
-		#if (!isset($_POST['oldPassword'])) $_POST['oldPassword'] = '';
-		#$this->settings = new Settings($this->database);
-
-    #testing
     $this->users = new Users($this->database);
-    echo $this->users->addUser($_POST['username'], $_POST['password'], 1);
-
-#		echo $this->settings->setLogin($_POST['oldPassword'], $_POST['username'], $_POST['password']);
+    echo $this->users->addUser($_POST['username'], $_POST['password'], 'admin');
 
 	}
 
@@ -343,7 +338,7 @@ class Admin extends Access {
 
       Module::dependencies(isset($_POST['username'], $_POST['password']));
       $users = new Users($this->database);
-      echo $users->addUser($_POST['username'], $_POST['password'], 1);
+      echo $users->addUser($_POST['username'], $_POST['password'], 'admin');
   
   }
 
@@ -360,6 +355,14 @@ class Admin extends Access {
       Module::dependencies(isset($_SESSION['username'], $_POST['oldPassword'], $_POST['newPassword'], $_POST['newPwRepeat'] ));
       $users = new Users($this->database);
       echo $users->changePassword( $_SESSION['username'], $_POST['oldPassword'], $_POST['newPassword'],$_POST['newPwRepeat']);
+
+  }
+
+  private function getUsers(){
+
+      $username = (isset($_POST['username'])) ? $_POST['username'] : '';
+      $users = new Users($this->database);
+      echo $users->get($username);
 
   }
 
