@@ -7,15 +7,25 @@ contextMenu = {}
 
 contextMenu.add = function(e) {
 
-	var items = [
-		{ type: 'item', title: build.iconic('image') + 'Upload Photo', fn: function() { $('#upload_files').click() } },
-		{ type: 'separator' },
-		{ type: 'item', title: build.iconic('link-intact') + 'Import from Link', fn: upload.start.url },
-		{ type: 'item', title: build.iconic('dropbox', 'ionicons') + 'Import from Dropbox', fn: upload.start.dropbox },
-		{ type: 'item', title: build.iconic('terminal') + 'Import from Server', fn: upload.start.server },
-		{ type: 'separator' },
-		{ type: 'item', title: build.iconic('folder') + 'New Album', fn: album.add }
-	];
+  var items;
+  if( lychee.role === 'admin'){
+     items = [
+        { type: 'item', title: build.iconic('image') + 'Upload Photo', fn: function() { $('#upload_files').click() } },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('link-intact') + 'Import from Link', fn: upload.start.url },
+        { type: 'item', title: build.iconic('dropbox', 'ionicons') + 'Import from Dropbox', fn: upload.start.dropbox },
+        { type: 'item', title: build.iconic('terminal') + 'Import from Server', fn: upload.start.server },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('folder') + 'New Album', fn: album.add }
+      ];
+  }
+  else if( lychee.role === 'user'){
+     items = [
+        { type: 'item', title: build.iconic('image') + 'Upload Photo', fn: function() { $('#upload_files').click() } },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('link-intact') + 'Import from Link', fn: upload.start.url },
+      ];
+  }
 
 	basicContext.show(items, e);
 
@@ -25,18 +35,31 @@ contextMenu.add = function(e) {
 
 contextMenu.settings = function(e) {
 
-	var items = [
-		{ type: 'item', title: build.iconic('person') + 'Change Password', fn: users.changePassword },
-		{ type: 'item', title: build.iconic('person') + 'Manage Users', fn: users.manageUsers },
-		{ type: 'item', title: build.iconic('sort-ascending') + 'Change Sorting', fn: settings.setSorting },
-		{ type: 'item', title: build.iconic('dropbox', 'ionicons') + 'Set Dropbox', fn: settings.setDropboxKey },
-		{ type: 'separator' },
-		{ type: 'item', title: build.iconic('info') + 'About Lychee', fn: function() { window.open(lychee.website) } },
-		{ type: 'item', title: build.iconic('wrench') + 'Diagnostics', fn: function() { window.open('plugins/check/') } },
-		{ type: 'item', title: build.iconic('align-left') + 'Show Log', fn: function() { window.open('plugins/displaylog/') } },
-		{ type: 'separator' },
-		{ type: 'item', title: build.iconic('account-logout') + 'Sign Out', fn: lychee.logout }
-	];
+  var items;
+  if( lychee.role === 'admin'){
+     items = [
+        { type: 'item', title: build.iconic('person') + 'Change Password', fn: users.changePassword },
+        { type: 'item', title: build.iconic('person') + 'Manage Users', fn: users.manageUsers },
+        { type: 'item', title: build.iconic('sort-ascending') + 'Change Sorting', fn: settings.setSorting },
+        { type: 'item', title: build.iconic('dropbox', 'ionicons') + 'Set Dropbox', fn: settings.setDropboxKey },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('info') + 'About Lychee', fn: function() { window.open(lychee.website) } },
+        { type: 'item', title: build.iconic('wrench') + 'Diagnostics', fn: function() { window.open('plugins/check/') } },
+        { type: 'item', title: build.iconic('align-left') + 'Show Log', fn: function() { window.open('plugins/displaylog/') } },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('account-logout') + 'Sign Out', fn: lychee.logout }
+      ];
+  }
+  else if( lychee.role === 'user'){
+      items = [
+        { type: 'item', title: build.iconic('person') + 'Change Password', fn: users.changePassword },
+        { type: 'item', title: build.iconic('sort-ascending') + 'Change Sorting', fn: settings.setSorting },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('info') + 'About Lychee', fn: function() { window.open(lychee.website) } },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('account-logout') + 'Sign Out', fn: lychee.logout }
+      ]; 
+  }
 
 	basicContext.show(items, e);
 
@@ -47,6 +70,9 @@ contextMenu.album = function(albumID, e) {
 	// Notice for 'Merge':
 	// fn must call basicContext.close() first,
 	// in order to keep the selection
+  
+  // Only admin can do stuff to the albums
+  if(lychee.role !== 'admin') return false;
 
 	if (albumID==='0'||albumID==='f'||albumID==='s'||albumID==='r') return false;
 
@@ -66,6 +92,9 @@ contextMenu.album = function(albumID, e) {
 }
 
 contextMenu.albumMulti = function(albumIDs, e) {
+
+  // Only admin can do stuff to the albums
+  if(lychee.role !== 'admin') return false;
 
 	multiselect.stopResize();
 
@@ -101,11 +130,15 @@ contextMenu.albumTitle = function(albumID, e) {
 
 			});
 
-			items.unshift({ type: 'separator' });
+      if( lychee.role === 'admin'){
+			  items.unshift({ type: 'separator' });
+      }
 
 		}
 
-		items.unshift({ type: 'item', title: build.iconic('pencil') + 'Rename', fn: function() { album.setTitle([albumID]) } });
+    if( lychee.role === 'admin'){
+		  items.unshift({ type: 'item', title: build.iconic('pencil') + 'Rename', fn: function() { album.setTitle([albumID]) } });
+    }
 
 		basicContext.show(items, e, contextMenu.close);
 
