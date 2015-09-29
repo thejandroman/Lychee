@@ -129,6 +129,16 @@ header.setMode = function(mode) {
 			$('#tools_album, #tools_photo').hide();
 			$('#tools_albums').show();
 
+      // Remove add button if user
+      try{
+        var role = localStorage.getItem('lychee_role');
+        if(role === 'user'){
+          $('#tools_albums .button_add').hide();
+        }
+      }catch(err){}
+
+
+
 
 			return true;
 			break;

@@ -22,6 +22,19 @@ photo.getID = function() {
 
 }
 
+photo.getAlbumId = function() {
+
+    var id = null;
+
+    if (photo.json)	id = photo.json.albumid;
+    else			id = $('.photo:hover, .photo.active').attr('data-album-id');
+
+    if ($.isNumeric(id)===true)	return id;
+    else						return false;
+
+
+}
+
 photo.load = function(photoID, albumID) {
 
 	var params,

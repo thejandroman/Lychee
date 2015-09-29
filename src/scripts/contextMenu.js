@@ -148,6 +148,9 @@ contextMenu.albumTitle = function(albumID, e) {
 
 contextMenu.mergeAlbum = function(albumID, e) {
 
+  // Only admin can do stuff to the albums
+  if(lychee.role !== 'admin') return false;
+
 	var items = [];
 
 	api.post('Album::getAll', {}, function(data) {
@@ -180,16 +183,31 @@ contextMenu.photo = function(photoID, e) {
 	// Notice for 'Move':
 	// fn must call basicContext.close() first,
 	// in order to keep the selection
+  var items;
 
-	var items = [
-		{ type: 'item', title: build.iconic('star') + 'Star', fn: function() { photo.setStar([photoID]) } },
-		{ type: 'item', title: build.iconic('tag') + 'Tags', fn: function() { photo.editTags([photoID]) } },
-		{ type: 'separator' },
-		{ type: 'item', title: build.iconic('pencil') + 'Rename', fn: function() { photo.setTitle([photoID]) } },
-		{ type: 'item', title: build.iconic('layers') + 'Duplicate', fn: function() { photo.duplicate([photoID]) } },
-		{ type: 'item', title: build.iconic('folder') + 'Move', fn: function() { basicContext.close(); contextMenu.move([photoID], e); } },
-		{ type: 'item', title: build.iconic('trash') + 'Delete', fn: function() { photo.delete([photoID]) } }
-	];
+  if (lychee.role == 'admin'){
+      items = [
+        { type: 'item', title: build.iconic('star') + 'Star', fn: function() { photo.setStar([photoID]) } },
+        { type: 'item', title: build.iconic('tag') + 'Tags', fn: function() { photo.editTags([photoID]) } },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('pencil') + 'Rename', fn: function() { photo.setTitle([photoID]) } },
+        { type: 'item', title: build.iconic('layers') + 'Duplicate', fn: function() { photo.duplicate([photoID]) } },
+        { type: 'item', title: build.iconic('folder') + 'Move', fn: function() { basicContext.close(); contextMenu.move([photoID], e); } },
+        { type: 'item', title: build.iconic('trash') + 'Delete', fn: function() { photo.delete([photoID]) } }
+      ];
+  }else if (lychee.role == 'user'){
+      items = [
+        { type: 'item', title: build.iconic('star') + 'Star', fn: function() { photo.setStar([photoID]) } },
+        { type: 'item', title: build.iconic('tag') + 'Tags', fn: function() { photo.editTags([photoID]) } },
+        { type: 'separator' },
+        { type: 'item', title: build.iconic('pencil') + 'Rename', fn: function() { photo.setTitle([photoID]) } },
+        { type: 'item', title: build.iconic('layers') + 'Duplicate', fn: function() { photo.duplicate([photoID]) } },
+      ]; 
+      if(album.json.erase == 1){
+          items.push({ type: 'item', title: build.iconic('trash') + 'Delete', fn: function() { photo.delete([photoID]) } });
+      
+      }
+  }
 
 	$('.photo[data-id="' + photoID + '"]').addClass('active');
 

@@ -97,6 +97,7 @@ build.photo = function(data) {
 	var html = '';
 
 	var {path: thumbPath, hasRetina: thumbRetina} = lychee.retinize(data.thumbUrl);
+  console.log(data);
 
 	html =	`
 			<div class='photo' data-album-id='${ data.album }' data-id='${ data.id }'>
